@@ -4,8 +4,76 @@ const ctx = canvas.getContext("2d");
 const ground = new Image();
 ground.src = "ground.png";
 
+var gradient_green = ctx.createLinearGradient(0, 0, 1000, 100);
+gradient_green.addColorStop(0, "green");
+gradient_green.addColorStop(1, "lime");
+
+var gradient_blue = ctx.createLinearGradient(0, 0, 1000, 100);
+gradient_blue.addColorStop(0, "MediumBlue");
+gradient_blue.addColorStop(1, "LightSkyBlue");
+
+var gradient_red = ctx.createLinearGradient(0, 0, 1000, 100);
+gradient_red.addColorStop(0, "LightCoral");
+gradient_red.addColorStop(1, "Maroon");
+
+let carrotCheckBoxIsChecked = false;
+let appleCheckBoxIsChecked = false;
+let grapeCheckBoxIsChecked = false;
+
+let color = gradient_green;
+
+window.onload = function() {
+	var appleCheckBox = document.getElementById('appleCheckbox');
+	var grapeCheckBox = document.getElementById('grapeCheckbox');
+	var carrotCheckBox = document.getElementById('carrotCheckbox');
+
+	var blueCheckBox = document.getElementById('blueCheckbox');
+	var redCheckBox = document.getElementById('redCheckbox');
+
+	appleCheckBox.checked = false;
+	grapeCheckBox.checked = false;
+	carrotCheckBox.checked = false;
+
+	blueCheckBox.checked = false;
+	redCheckBox.checked = false;
+
+	//food
+	if (carrotCheckBox == false && grapeCheckBox.checked == false && appleCheckBox == false) {
+		foodImg.src = "carrot.png";
+	}
+
+	appleCheckBox.onchange = function() {
+		foodImg.src = "apple.png";
+		appleCheckBoxIsChecked = true;
+	}
+
+	carrotCheckBox.onchange = function() {
+		foodImg.src = "carrot.png";
+		carrotCheckBoxIsChecked = true;
+	}
+
+	grapeCheckBox.onchange = function() {
+		foodImg.src = "grape.png";
+		grapeCheckBoxIsChecked = true;
+	}
+
+	//colors
+
+	if (blueCheckBox == false && redCheckBox.checked == false) {
+		color = gradient_green;
+	}
+
+	redCheckBox.onchange = function() {
+		color = gradient_red;
+	}
+
+	blueCheckBox.onchange = function() {
+		color = gradient_blue;
+	}
+}
+
 const foodImg = new Image();
-foodImg.src = "food.png";
+foodImg.src = "carrot.png";
 
 let box = 32;
 
@@ -21,6 +89,14 @@ snake[0] = {
 	x: 9 * box,
 	y: 10 * box
 };
+
+function drawingText(text) {
+	h1 = document.createElement("h1");
+	Text = document.createTextNode(text);
+
+	h1.appendChild(Text);
+	document.body.appendChild(h1);
+}
 
 document.addEventListener("keydown", direction);
 
@@ -50,12 +126,13 @@ function drawGame() {
 	ctx.drawImage(foodImg, food.x, food.y);
 
 	for(let i = 0; i < snake.length; i++) {
-		ctx.fillStyle = i == 0 ? "green" : "green";
+		// ctx.fillStyle = i == 0 ? color : color;
+		ctx.fillStyle = color;
 		ctx.fillRect(snake[i].x, snake[i].y, box, box);
 	}
 
 	ctx.fillStyle = "white";
-	ctx.font = "50px Arial";
+	ctx.font = "45px Verdana";
 	ctx.fillText(score, box * 2.5, box * 1.7);
 
 	let snakeX = snake[0].x;
@@ -71,7 +148,7 @@ function drawGame() {
 		snake.pop();
 
 	if(snakeX < box || snakeX > box * 17
-		|| snakeY < 3 * box || snakeY > box * 17)
+		|| snakeY < 3 * box || snakeY > box * 16)
 		clearInterval(game);
 
 	if(dir == "left") snakeX -= box;
