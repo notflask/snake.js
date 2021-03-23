@@ -4,6 +4,14 @@ const ctx = canvas.getContext("2d");
 const ground = new Image();
 ground.src = "ground.png";
 
+var fps;
+var controls = "arrows";
+
+var forwardKey;
+var leftKey;
+var rightKey;
+var behindKey;
+
 var gradient_green = ctx.createLinearGradient(0, 0, 1000, 100);
 gradient_green.addColorStop(0, "green");
 gradient_green.addColorStop(1, "lime");
@@ -16,6 +24,11 @@ var gradient_red = ctx.createLinearGradient(0, 0, 1000, 100);
 gradient_red.addColorStop(0, "LightCoral");
 gradient_red.addColorStop(1, "Maroon");
 
+var gradient_purple = ctx.createLinearGradient(0, 0, 1000, 100);
+gradient_purple.addColorStop(0, "DarkMagenta");
+gradient_purple.addColorStop(1, "BlueViolet");
+
+
 let carrotCheckBoxIsChecked = false;
 let appleCheckBoxIsChecked = false;
 let grapeCheckBoxIsChecked = false;
@@ -27,18 +40,50 @@ window.onload = function() {
 	var grapeCheckBox = document.getElementById('grapeCheckbox');
 	var carrotCheckBox = document.getElementById('carrotCheckbox');
 
+	var fps30 = document.getElementById('30fps');
+	var fps60 = document.getElementById('60fps');
+	var fps80 = document.getElementById('80fps');
+
+	var arrowsCheckBox = document.getElementById('arrows');
+	var wasdCheckBox = document.getElementById('wasd');
+
 	var blueCheckBox = document.getElementById('blueCheckbox');
 	var redCheckBox = document.getElementById('redCheckbox');
+	var purpleCheckBox = document.getElementById('purpleCheckbox');
 
 	appleCheckBox.checked = false;
 	grapeCheckBox.checked = false;
 	carrotCheckBox.checked = false;
 
+	fps30.checked = false;
+	fps60.checked = false;
+	fps80.checked = false;
+
 	blueCheckBox.checked = false;
 	redCheckBox.checked = false;
+	purpleCheckBox.checked = false;
+
+	//controls
+	if (arrowsCheckBox.checked == false && wasdCheckBox.checked == false) {
+		controls = "arrows";
+		console.log(controls)
+		forwardKey = 38;
+		leftKey = 37;
+		behindKey = 40;
+		rightKey = 39;
+	}
+
+	wasdCheckBox.onchange = function () {
+		controls = "wasd";
+		console.log(controls)
+		forwardKey = 87;
+		leftKey = 65;
+		behindKey = 83;
+		rightKey = 68;
+	}
 
 	//food
-	if (carrotCheckBox == false && grapeCheckBox.checked == false && appleCheckBox == false) {
+	if (carrotCheckBox.checked == false && grapeCheckBox.checked == false && appleCheckBox.checked == false) {
 		foodImg.src = "carrot.png";
 	}
 
@@ -50,12 +95,36 @@ window.onload = function() {
 	carrotCheckBox.onchange = function() {
 		foodImg.src = "carrot.png";
 		carrotCheckBoxIsChecked = true;
+		
 	}
 
 	grapeCheckBox.onchange = function() {
 		foodImg.src = "grape.png";
 		grapeCheckBoxIsChecked = true;
 	}
+
+	//fps
+	if (fps30.checked == false && fps60.checked == false && fps80.checked == false) {
+		fps = 100;
+		localStorage.setItem("fps", fps)
+	}
+
+	fps30.onchange = function() {
+		fps = 30;
+		localStorage.setItem("fps", fps)
+		console.log(fps)
+	}
+	fps60.onchange = function() {
+		fps = 60;
+		localStorage.setItem("fps", fps)
+		console.log(fps)
+	}
+	fps80.onchange = function() {
+		fps = 80;
+		localStorage.setItem("fps", fps)
+		console.log(fps)
+	}
+
 
 	//colors
 
@@ -69,6 +138,10 @@ window.onload = function() {
 
 	blueCheckBox.onchange = function() {
 		color = gradient_blue;
+	}
+
+	purpleCheckBox.onchange = function() {
+		color = gradient_purple;
 	}
 }
 
@@ -103,20 +176,20 @@ document.addEventListener("keydown", direction);
 let dir;
 
 function direction(event) {
-	if(event.keyCode == 37 && dir != "right")
+	if(event.keyCode == leftKey && dir != "right")
 		dir = "left";
-	else if(event.keyCode == 38 && dir != "down")
+	else if(event.keyCode == forwardKey && dir != "down")
 		dir = "up";
-	else if(event.keyCode == 39 && dir != "left")
+	else if(event.keyCode == rightKey && dir != "left")
 		dir = "right";
-	else if(event.keyCode == 40 && dir != "up")
+	else if(event.keyCode == behindKey && dir != "up")
 		dir = "down";
 }
 
 function eatTail(head, arr) {
 	for(let i = 0; i < arr.length; i++) {
 		if(head.x == arr[i].x && head.y == arr[i].y)
-			clearInterval(game);
+		document.location.reload();
 	}
 }
 
@@ -149,7 +222,7 @@ function drawGame() {
 
 	if(snakeX < box || snakeX > box * 17
 		|| snakeY < 3 * box || snakeY > box * 16)
-		clearInterval(game);
+		document.location.reload();
 
 	if(dir == "left") snakeX -= box;
 	if(dir == "right") snakeX += box;
@@ -166,11 +239,4 @@ function drawGame() {
 	snake.unshift(newHead);
 }
 
-let game = setInterval(drawGame, 100);
-
-
-
-
-
-
-
+let game = setInterval(drawGame, localStorage.getItem("fps"));
